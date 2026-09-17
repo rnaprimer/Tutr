@@ -1,11 +1,15 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, Suspense } from 'react'
 import { signup } from '@/actions/auth'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
-export default function SignupPage() {
+function SignupForm() {
   const [state, formAction, isPending] = useActionState(signup, null)
+  const searchParams = useSearchParams()
+  const roleParam = searchParams.get('role')?.toUpperCase()
+  const defaultRole = roleParam === 'TEACHER' ? 'TEACHER' : roleParam === 'PARENT' ? 'PARENT' : 'STUDENT'
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
@@ -66,6 +70,7 @@ export default function SignupPage() {
                 id="role"
                 name="role"
                 required
+                defaultValue={defaultRole}
                 className="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600 sm:text-sm sm:leading-6 bg-white"
               >
                 <option value="STUDENT">Student</option>
@@ -93,5 +98,13 @@ export default function SignupPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-gray-50 text-gray-500">Loading...</div>}>
+      <SignupForm />
+    </Suspense>
   )
 }

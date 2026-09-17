@@ -11,10 +11,21 @@ export default function Home() {
         <p className="mx-auto mt-3 max-w-md text-base text-gray-500 sm:text-lg md:mt-5 md:max-w-3xl md:text-xl">
           Connect with trusted, verified local educators for offline classes. Tailored to your needs, budget, and location.
         </p>
-        <div className="mx-auto mt-5 max-w-md sm:flex sm:justify-center md:mt-8">
-          <div className="rounded-md shadow">
-            <Link href="/tutors" className="flex w-full items-center justify-center rounded-md border border-transparent bg-blue-600 px-8 py-3 text-base font-medium text-white hover:bg-blue-700 md:py-4 md:px-10 md:text-lg">
-              Find a Tutor
+        <div className="mx-auto mt-6 flex max-w-xs flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center sm:gap-4 md:mt-8">
+          <div className="rounded-md shadow-sm">
+            <Link
+              href="/tutors"
+              className="flex w-full items-center justify-center rounded-md border border-transparent bg-blue-600 px-6 py-3 text-base font-medium text-white hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 md:py-4 md:px-8 md:text-lg"
+            >
+              I am a Student
+            </Link>
+          </div>
+          <div className="rounded-md shadow-sm">
+            <Link
+              href="/signup?role=TEACHER"
+              className="flex w-full items-center justify-center rounded-md border border-transparent bg-blue-600 px-6 py-3 text-base font-medium text-white hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 md:py-4 md:px-8 md:text-lg"
+            >
+              I am a Tutor
             </Link>
           </div>
         </div>
