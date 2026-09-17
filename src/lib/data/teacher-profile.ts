@@ -118,12 +118,12 @@ export function calculateProfileCompleteness(data: any): ProfileCompleteness {
   // 6. Availability
   check(data.availability.length > 0, 'Availability', 'At least one availability slot is required', '/dashboard/teacher/onboarding/availability')
 
-  // 7. Documents (Identity is strictly required. Qualification/Experience is highly recommended but let's make at least IDENTITY required for V1)
+  // 7. Documents (Aadhaar Card Identification and Qualification Certificate are required)
   const hasIdentityDoc = data.documents.some((d: any) => d.category === 'IDENTITY')
   const hasQualDoc = data.documents.some((d: any) => d.category === 'QUALIFICATION')
   
-  check(hasIdentityDoc, 'Documents', 'Identity Verification Document is required', '/dashboard/teacher/onboarding/documents')
-  check(hasQualDoc, 'Documents', 'Qualification Document is required', '/dashboard/teacher/onboarding/documents')
+  check(hasIdentityDoc, 'Documents', 'Aadhaar Card Identification is required', '/dashboard/teacher/onboarding/documents')
+  check(hasQualDoc, 'Documents', 'Qualification Certificate is required', '/dashboard/teacher/onboarding/documents')
 
   const percentage = Math.round((passedChecks / totalChecks) * 100)
   const isReadyForSubmission = passedChecks === totalChecks

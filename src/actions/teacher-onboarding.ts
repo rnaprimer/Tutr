@@ -243,6 +243,7 @@ export async function uploadVerificationDocument(formData: FormData) {
     return { error: 'Failed to record document in database' }
   }
 
+  revalidatePath('/dashboard/teacher', 'layout')
   revalidatePath('/dashboard/teacher/onboarding/documents')
   return { success: 'Document uploaded' }
 }
@@ -268,6 +269,7 @@ export async function deleteVerificationDocument(formData: FormData) {
   // 2. Delete from storage
   await supabase.storage.from('verification_documents').remove([filePath])
 
+  revalidatePath('/dashboard/teacher', 'layout')
   revalidatePath('/dashboard/teacher/onboarding/documents')
   return { success: 'Deleted successfully' }
 }

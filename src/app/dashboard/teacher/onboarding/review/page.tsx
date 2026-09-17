@@ -68,9 +68,20 @@ export default async function ReviewPage() {
           <h3 className="text-lg font-medium text-gray-900 border-b pb-2 mb-3">6. Verification Documents</h3>
           <p className="text-sm mb-2 text-gray-500 italic">Documents remain private and are only visible to admins.</p>
           <ul className="text-sm space-y-1">
-            {data.documents.map((doc: any) => (
-              <li key={doc.id}>- {doc.category}: <span className="text-gray-600">{doc.file_path.split('/').pop()}</span></li>
-            ))}
+            {data.documents.map((doc: any) => {
+              const label =
+                doc.category === 'IDENTITY'
+                  ? 'Aadhaar Card Identification'
+                  : doc.category === 'QUALIFICATION'
+                  ? 'Qualification Certificate'
+                  : doc.category
+              return (
+                <li key={doc.id}>
+                  - <strong className="font-medium text-gray-800">{label}:</strong>{' '}
+                  <span className="text-gray-600">{doc.file_path.split('/').pop()}</span>
+                </li>
+              )
+            })}
           </ul>
         </div>
       </div>

@@ -47,14 +47,21 @@ export function DocumentReview({ documents, isReviewing }: DocumentReviewProps) 
       )}
       
       <ul role="list" className="divide-y divide-gray-200">
-        {documents.map((doc) => (
-          <li key={doc.id} className="flex items-center justify-between py-4 px-6">
-            <div className="flex flex-col">
-              <p className="text-sm font-medium text-gray-900">{doc.category.replace('_', ' ')}</p>
-              <p className="text-sm text-gray-500">
-                Uploaded: {new Date(doc.created_at).toLocaleDateString()}
-              </p>
-            </div>
+        {documents.map((doc) => {
+          const label =
+            doc.category === 'IDENTITY'
+              ? 'Aadhaar Card Identification'
+              : doc.category === 'QUALIFICATION'
+              ? 'Qualification Certificate'
+              : doc.category.replace('_', ' ')
+          return (
+            <li key={doc.id} className="flex items-center justify-between py-4 px-6">
+              <div className="flex flex-col">
+                <p className="text-sm font-semibold text-gray-900">{label}</p>
+                <p className="text-xs text-gray-500">
+                  Uploaded: {new Date(doc.created_at).toLocaleDateString()}
+                </p>
+              </div>
             <div className="flex items-center gap-6">
               {doc.signed_url ? (
                 <a
@@ -86,7 +93,7 @@ export function DocumentReview({ documents, isReviewing }: DocumentReviewProps) 
               </div>
             </div>
           </li>
-        ))}
+        )})}
       </ul>
     </div>
   )
