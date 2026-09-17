@@ -64,7 +64,7 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent('Could not retrieve user session')}`)
   }
 
-  // 1. Check existing profile (Existing role ALWAYS wins)
+  // 1. Check existing profile and admin status
   const { data: existingProfile } = (await supabase
     .from('profiles')
     .select('id, role, display_name')
@@ -76,6 +76,45 @@ export async function GET(request: Request) {
     .select('role')
     .eq('id', user.id)
     .maybeSingle()) as any
+
+  // Check admin emails configured in environment
+  const adminEmails = (process.env.ADMIN_EMAILS || '')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean)
+
+  const userEmail = (user.email || '').toLowerCase()
+  const isAdminByEmail = adminEmails.includes(userEmail)
+  const isAdmin = !!adminUser || isAdminByEmail
+
+  // If user is Admin, auto-provision and route directly to Teacher Verification Queue
+  if (isAdmin) {
+    if (isAdminByEmail && !adminUser) {
+      await supabase.from('admin_users').upsert({
+        id: user.id,
+        role: 'SUPER_ADMIN',
+      } as any)
+    }
+
+    if (!existingProfile) {
+      const adminName =
+        user.user_metadata?.full_name ||
+        user.user_metadata?.name ||
+        user.email?.split('@')[0] ||
+        'Admin'
+      await (supabase as any).from('profiles').insert({
+        id: user.id,
+        role: 'ADMIN',
+        display_name: adminName,
+        avatar_url: user.user_metadata?.avatar_url || null,
+      })
+    } else if (existingProfile.role !== 'ADMIN') {
+      await (supabase as any).from('profiles').update({ role: 'ADMIN' }).eq('id', user.id)
+    }
+
+    // Direct redirect to Teacher Applications Verification Queue
+    return NextResponse.redirect(`${origin}${getSafeRedirect(rawNext, '/admin/teachers')}`)
+  }
 
   // Sanitize roleParam: treat client role strictly as untrusted intent; allow ONLY non-admin public roles
   const targetRole = roleParam && ALLOWED_SIGNUP_ROLES.includes(roleParam as UserRole)
@@ -89,10 +128,6 @@ export async function GET(request: Request) {
       const fallbackUrl = getRoleDashboard(existingProfile.role)
       const message = `You are signed in to your existing ${existingProfile.role.toLowerCase()} account. Your account role has been preserved.`
       return NextResponse.redirect(`${origin}${fallbackUrl}?message=${encodeURIComponent(message)}`)
-    }
-
-    if (adminUser) {
-      return NextResponse.redirect(`${origin}${getSafeRedirect(rawNext, '/admin')}`)
     }
 
     return NextResponse.redirect(`${origin}${getSafeRedirect(rawNext, getRoleDashboard(existingProfile.role))}`)

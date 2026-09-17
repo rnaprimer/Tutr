@@ -1,98 +1,53 @@
 'use client'
 
-import { useActionState, Suspense } from 'react'
-import { login } from '@/actions/auth'
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton'
 
 function LoginForm() {
-  const [state, formAction, isPending] = useActionState(login, null)
   const searchParams = useSearchParams()
   const message = searchParams.get('message')
   const errorParam = searchParams.get('error')
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-lg shadow">
+    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-gray-50/60 px-4 py-12 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-6 bg-white p-8 sm:p-10 rounded-2xl shadow-sm border border-gray-100 text-center">
         <div>
-          <h2 className="text-center text-3xl font-bold tracking-tight text-gray-900">
-            Log in to Tutr
+          <div className="mx-auto w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xl mb-4">
+            T
+          </div>
+          <h2 className="text-2xl font-bold tracking-tight text-gray-900">
+            Welcome to Tutr
           </h2>
+          <p className="mt-2 text-sm text-gray-500">
+            Sign in with your Google account to access your dashboard.
+          </p>
         </div>
 
-        {/* Google OAuth Option */}
-        <div className="mt-6">
+        {errorParam && (
+          <div className="rounded-xl bg-red-50 p-4 border border-red-200 text-left">
+            <div className="text-sm font-medium text-red-700">{errorParam}</div>
+          </div>
+        )}
+
+        {message && (
+          <div className="rounded-xl bg-green-50 p-4 border border-green-200 text-left">
+            <div className="text-sm font-medium text-green-700">{message}</div>
+          </div>
+        )}
+
+        <div className="pt-2">
           <GoogleSignInButton mode="login" />
         </div>
 
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300" />
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="bg-white px-3 text-gray-500 font-medium">OR</span>
-          </div>
+        <div className="pt-4 border-t border-gray-100 text-center text-xs text-gray-400">
+          Tutors, students, parents, and administrators sign in securely via Google OAuth.
         </div>
 
-        <form className="space-y-6" action={formAction}>
-          {(state?.error || errorParam) && (
-            <div className="rounded-md bg-red-50 p-4 border border-red-200">
-              <div className="text-sm text-red-700">{state?.error || errorParam}</div>
-            </div>
-          )}
-          
-          {message && (
-            <div className="rounded-md bg-green-50 p-4 border border-green-200">
-              <div className="text-sm text-green-700">{message}</div>
-            </div>
-          )}
-
-          <div className="space-y-4 rounded-md shadow-sm">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email address</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="mt-1 relative block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 px-3"
-              />
-            </div>
-
-            <div>
-              <div className="flex justify-between">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-                <Link href="/forgot-password" className="text-sm font-medium text-blue-600 hover:text-blue-500">
-                  Forgot password?
-                </Link>
-              </div>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="mt-1 relative block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 px-3"
-              />
-            </div>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              disabled={isPending}
-              className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50"
-            >
-              {isPending ? 'Logging in...' : 'Log in'}
-            </button>
-          </div>
-        </form>
-
         <div className="text-center text-sm">
-          <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
-            Don&apos;t have an account? Sign up
+          <Link href="/signup?role=TEACHER" className="font-medium text-blue-600 hover:text-blue-700">
+            Want to teach? Join as a Tutor
           </Link>
         </div>
       </div>
