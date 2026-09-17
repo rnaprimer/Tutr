@@ -34,6 +34,7 @@ export async function saveBasicInformation(formData: FormData) {
     await supabase.from('teacher_profiles').insert({ profile_id: user.id, status: 'DRAFT' })
   }
 
+  revalidatePath('/dashboard/teacher', 'layout')
   redirect('/dashboard/teacher/onboarding/teaching-info')
 }
 
@@ -55,6 +56,7 @@ export async function saveTeachingInformation(formData: FormData) {
 
   if (error) return { error: error.message }
   
+  revalidatePath('/dashboard/teacher', 'layout')
   redirect('/dashboard/teacher/onboarding/subjects-classes')
 }
 
@@ -88,6 +90,7 @@ export async function saveTaxonomies(formData: FormData) {
     await supabase.from('teacher_boards').insert(boards.map(board_id => ({ teacher_id: user.id, board_id })))
   }
 
+  revalidatePath('/dashboard/teacher', 'layout')
   redirect('/dashboard/teacher/onboarding/teaching-areas')
 }
 
@@ -107,6 +110,7 @@ export async function saveTeachingAreas(formData: FormData) {
 
   if (error) return { error: error.message }
   
+  revalidatePath('/dashboard/teacher', 'layout')
   redirect('/dashboard/teacher/onboarding/pricing')
 }
 
@@ -146,6 +150,7 @@ export async function savePricing(formData: FormData) {
 
   if (error) return { error: error.message }
   
+  revalidatePath('/dashboard/teacher', 'layout')
   redirect('/dashboard/teacher/onboarding/availability')
 }
 
@@ -196,6 +201,7 @@ export async function deleteAvailability(formData: FormData) {
 
 export async function completeAvailability() {
   // Simple redirect to next step
+  revalidatePath('/dashboard/teacher', 'layout')
   redirect('/dashboard/teacher/onboarding/documents')
 }
 
@@ -267,6 +273,7 @@ export async function deleteVerificationDocument(formData: FormData) {
 }
 
 export async function completeDocuments() {
+  revalidatePath('/dashboard/teacher', 'layout')
   redirect('/dashboard/teacher/onboarding/review')
 }
 
@@ -297,5 +304,6 @@ export async function submitTeacherForVerification(_formData?: FormData) {
 
   if (error) return { error: error.message }
 
+  revalidatePath('/dashboard/teacher', 'layout')
   redirect('/dashboard/teacher')
 }
