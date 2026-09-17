@@ -33,6 +33,7 @@
   "exclude": [
     "node_modules",
     "test_phase7b_security.ts",
-    "verify_security.ts"
+    "verify_security.ts",
+    "test_auth_security.ts"
   ]
 }

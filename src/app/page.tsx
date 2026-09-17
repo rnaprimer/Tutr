@@ -14,7 +14,7 @@ export default function Home() {
         <div className="mx-auto mt-6 flex max-w-xs flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center sm:gap-4 md:mt-8">
           <div className="rounded-md shadow-sm">
             <Link
-              href="/tutors"
+              href="/signup?role=STUDENT"
               className="flex w-full items-center justify-center rounded-md border border-transparent bg-blue-600 px-6 py-3 text-base font-medium text-white hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 md:py-4 md:px-8 md:text-lg"
             >
               I am a Student

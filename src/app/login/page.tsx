@@ -1,11 +1,12 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, Suspense } from 'react'
 import { login } from '@/actions/auth'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
+import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton'
 
-export default function LoginPage() {
+function LoginForm() {
   const [state, formAction, isPending] = useActionState(login, null)
   const searchParams = useSearchParams()
   const message = searchParams.get('message')
@@ -19,15 +20,30 @@ export default function LoginPage() {
             Log in to Tutr
           </h2>
         </div>
-        <form className="mt-8 space-y-6" action={formAction}>
+
+        {/* Google OAuth Option */}
+        <div className="mt-6">
+          <GoogleSignInButton mode="login" />
+        </div>
+
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300" />
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="bg-white px-3 text-gray-500 font-medium">OR</span>
+          </div>
+        </div>
+
+        <form className="space-y-6" action={formAction}>
           {(state?.error || errorParam) && (
-            <div className="rounded-md bg-red-50 p-4">
+            <div className="rounded-md bg-red-50 p-4 border border-red-200">
               <div className="text-sm text-red-700">{state?.error || errorParam}</div>
             </div>
           )}
           
           {message && (
-            <div className="rounded-md bg-green-50 p-4">
+            <div className="rounded-md bg-green-50 p-4 border border-green-200">
               <div className="text-sm text-green-700">{message}</div>
             </div>
           )}
@@ -81,5 +97,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-gray-50 text-gray-500">Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   )
 }
