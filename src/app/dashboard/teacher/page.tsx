@@ -96,6 +96,11 @@ export default async function TeacherDashboard() {
                   View Profile
                 </Link>
               )}
+              {status === 'VERIFIED' && (
+                <Link href="/dashboard/teacher/requests" className="block w-full rounded-md bg-indigo-600 px-4 py-3 text-center text-sm font-medium text-white hover:bg-indigo-700">
+                  Incoming Requests
+                </Link>
+              )}
             </div>
           </div>
         </div>

@@ -45,7 +45,7 @@ export default async function ParentDashboard() {
                 Find a Tutor
               </Link>
               <Link href="/dashboard/parent/requests" className="block w-full rounded-md border border-gray-300 bg-white px-4 py-3 text-center text-sm font-medium text-gray-700 hover:bg-gray-50">
-                My Requests (Placeholder)
+                Student Requests
               </Link>
             </div>
           </div>

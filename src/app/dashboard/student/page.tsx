@@ -27,10 +27,10 @@ export default async function StudentDashboard() {
             <h2 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h2>
             <div className="space-y-3">
               <Link href="/tutors" className="block w-full rounded-md bg-blue-50 px-4 py-3 text-center text-sm font-medium text-blue-700 hover:bg-blue-100">
-                Find a Tutor (Placeholder)
+                Find a Tutor
               </Link>
               <Link href="/dashboard/student/requests" className="block w-full rounded-md border border-gray-300 bg-white px-4 py-3 text-center text-sm font-medium text-gray-700 hover:bg-gray-50">
-                My Requests (Placeholder)
+                My Requests
               </Link>
             </div>
           </div>

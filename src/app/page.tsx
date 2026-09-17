@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default function Home() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
@@ -11,9 +13,9 @@ export default function Home() {
         </p>
         <div className="mx-auto mt-5 max-w-md sm:flex sm:justify-center md:mt-8">
           <div className="rounded-md shadow">
-            <a href="/tutors" className="flex w-full items-center justify-center rounded-md border border-transparent bg-blue-600 px-8 py-3 text-base font-medium text-white hover:bg-blue-700 md:py-4 md:px-10 md:text-lg">
+            <Link href="/tutors" className="flex w-full items-center justify-center rounded-md border border-transparent bg-blue-600 px-8 py-3 text-base font-medium text-white hover:bg-blue-700 md:py-4 md:px-10 md:text-lg">
               Find a Tutor
-            </a>
+            </Link>
           </div>
         </div>
       </div>
