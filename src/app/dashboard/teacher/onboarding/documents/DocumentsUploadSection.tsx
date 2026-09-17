@@ -72,7 +72,11 @@ export function DocumentsUploadSection({ documents }: DocumentsUploadSectionProp
           form.reset()
         }
       } catch (err: any) {
-        setError(err?.message || 'An unexpected error occurred during upload.')
+        const rawMsg = err?.message || ''
+        const friendlyMsg = rawMsg.includes('Minified React error') || rawMsg.includes('Body exceeded')
+          ? 'Upload failed. The file is too large or invalid. Please ensure the file is under 5MB.'
+          : rawMsg || 'An unexpected error occurred during upload.'
+        setError(friendlyMsg)
       } finally {
         setUploadingCategory(null)
       }

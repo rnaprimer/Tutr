@@ -206,72 +206,90 @@ export async function completeAvailability() {
 }
 
 export async function uploadVerificationDocument(formData: FormData) {
-  const user = await requireRole(['TEACHER'])
-  const file = formData.get('file') as File
-  const category = formData.get('category') as Database['public']['Enums']['verification_category']
+  try {
+    const user = await requireRole(['TEACHER'])
+    const file = formData.get('file') as File
+    const category = formData.get('category') as Database['public']['Enums']['verification_category']
 
-  if (!file || file.size === 0) return { error: 'File is required' }
-  if (!['IDENTITY', 'QUALIFICATION', 'EXPERIENCE'].includes(category)) return { error: 'Invalid category' }
-  
-  if (file.size > 5 * 1024 * 1024) return { error: 'File size must be under 5MB' }
+    if (!file || file.size === 0) return { error: 'File is required' }
+    if (!['IDENTITY', 'QUALIFICATION', 'EXPERIENCE'].includes(category)) return { error: 'Invalid category' }
+    
+    if (file.size > 5 * 1024 * 1024) return { error: 'File size must be under 5MB' }
 
-  const supabase = await createClient()
+    const supabase = await createClient()
 
-  // Generate secure path: [teacher_id]/[timestamp]_[filename]
-  const timestamp = Date.now()
-  const filePath = `${user.id}/${category}/${timestamp}_${file.name.replace(/[^a-zA-Z0-9.]/g, '')}`
+    // Generate secure path: [teacher_id]/[category]/[timestamp]_[filename]
+    const timestamp = Date.now()
+    const sanitizedFileName = (file.name || 'document').replace(/[^a-zA-Z0-9._-]/g, '_')
+    const filePath = `${user.id}/${category}/${timestamp}_${sanitizedFileName}`
 
-  // 1. Upload to storage bucket using user's authenticated session
-  const { error: uploadError } = await supabase.storage
-    .from('verification_documents')
-    .upload(filePath, file)
+    // Read file bytes as Buffer for reliable transmission in Node runtime
+    const arrayBuffer = await file.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
 
-  if (uploadError) return { error: `Upload failed: ${uploadError.message}` }
+    // 1. Upload to storage bucket using user's authenticated session
+    const { error: uploadError } = await supabase.storage
+      .from('verification_documents')
+      .upload(filePath, buffer, {
+        contentType: file.type || 'application/octet-stream',
+        upsert: true,
+      })
 
-  // 2. Insert into database
-  // @ts-ignore
-  const { error: dbError } = (await supabase.from('verification_documents').insert({
-    teacher_id: user.id,
-    category,
-    file_path: filePath,
-    status: 'PENDING'
-  } as any))
+    if (uploadError) return { error: `Upload failed: ${uploadError.message}` }
 
-  if (dbError) {
-    // Attempt rollback of storage file
-    await supabase.storage.from('verification_documents').remove([filePath])
-    return { error: 'Failed to record document in database' }
+    // 2. Insert into database
+    // @ts-ignore
+    const { error: dbError } = (await supabase.from('verification_documents').insert({
+      teacher_id: user.id,
+      category,
+      file_path: filePath,
+      status: 'PENDING'
+    } as any))
+
+    if (dbError) {
+      // Attempt rollback of storage file
+      await supabase.storage.from('verification_documents').remove([filePath])
+      return { error: 'Failed to record document in database' }
+    }
+
+    revalidatePath('/dashboard/teacher', 'layout')
+    revalidatePath('/dashboard/teacher/onboarding/documents')
+    return { success: 'Document uploaded' }
+  } catch (err: any) {
+    console.error('uploadVerificationDocument error:', err)
+    return { error: err?.message || 'Upload failed. Please try again with a file under 5MB.' }
   }
-
-  revalidatePath('/dashboard/teacher', 'layout')
-  revalidatePath('/dashboard/teacher/onboarding/documents')
-  return { success: 'Document uploaded' }
 }
 
 export async function deleteVerificationDocument(formData: FormData) {
-  const user = await requireRole(['TEACHER'])
-  const id = formData.get('id') as string
-  const filePath = formData.get('file_path') as string
+  try {
+    const user = await requireRole(['TEACHER'])
+    const id = formData.get('id') as string
+    const filePath = formData.get('file_path') as string
 
-  if (!id || !filePath) return { error: 'Invalid request' }
+    if (!id || !filePath) return { error: 'Invalid request' }
 
-  const supabase = await createClient()
+    const supabase = await createClient()
 
-  // Verify ownership before deleting
-  const { data: doc } = (await supabase.from('verification_documents').select('teacher_id').eq('id', id).single()) as any
-  if (doc?.teacher_id !== user.id) return { error: 'Unauthorized' }
+    // Verify ownership before deleting
+    const { data: doc } = (await supabase.from('verification_documents').select('teacher_id').eq('id', id).single()) as any
+    if (doc?.teacher_id !== user.id) return { error: 'Unauthorized' }
 
-  // 1. Delete from database first
-  const { error: dbError } = (await supabase.from('verification_documents').delete().eq('id', id).eq('teacher_id', user.id))
-  
-  if (dbError) return { error: 'Failed to delete record' }
+    // 1. Delete from database first
+    const { error: dbError } = (await supabase.from('verification_documents').delete().eq('id', id).eq('teacher_id', user.id))
+    
+    if (dbError) return { error: 'Failed to delete record' }
 
-  // 2. Delete from storage
-  await supabase.storage.from('verification_documents').remove([filePath])
+    // 2. Delete from storage
+    await supabase.storage.from('verification_documents').remove([filePath])
 
-  revalidatePath('/dashboard/teacher', 'layout')
-  revalidatePath('/dashboard/teacher/onboarding/documents')
-  return { success: 'Deleted successfully' }
+    revalidatePath('/dashboard/teacher', 'layout')
+    revalidatePath('/dashboard/teacher/onboarding/documents')
+    return { success: 'Deleted successfully' }
+  } catch (err: any) {
+    console.error('deleteVerificationDocument error:', err)
+    return { error: err?.message || 'Failed to delete document.' }
+  }
 }
 
 export async function completeDocuments() {
